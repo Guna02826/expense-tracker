@@ -22,13 +22,23 @@ function Navbar() {
 
   return (
     <nav className="bg-gray-800 text-white p-4 flex justify-between items-center">
-      <div className="flex gap-4">
-        <Link to="/dashboard" className="hover:text-blue-400">
-          Dashboard
+      <div className="flex gap-6 items-center">
+        {/* App Logo/Title */}
+        <Link
+          to="/dashboard"
+          className="text-2xl font-bold text-white hover:text-blue-400"
+        >
+          Trackeroo
         </Link>
-        <Link to="/transactions" className="hover:text-blue-400">
-          Transactions
-        </Link>
+
+        <div className="flex gap-4">
+          <Link to="/dashboard" className="hover:text-blue-400">
+            Dashboard
+          </Link>
+          <Link to="/transactions" className="hover:text-blue-400">
+            Transactions
+          </Link>
+        </div>
       </div>
       <button
         onClick={handleLogout}
@@ -37,6 +47,15 @@ function Navbar() {
         Logout
       </button>
     </nav>
+  );
+}
+
+function Header() {
+  return (
+    <header className="bg-gray-800 text-white p-4 text-center">
+      <h1 className="text-2xl font-bold">Trackeroo</h1>
+      <p className="text-gray-300 text-sm">An Expense Tracker</p>
+    </header>
   );
 }
 
@@ -61,8 +80,23 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route
+          path="/login"
+          element={
+            <>
+              <Header /> <Login />
+            </>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <>
+              <Header />
+              <Register />
+            </>
+          }
+        />
 
         <Route
           path="/dashboard"
