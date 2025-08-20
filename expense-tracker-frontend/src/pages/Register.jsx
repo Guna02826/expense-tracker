@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router";
-import axios from "../api/axios";
+import api from "../api/axios";
 
 export default function Register() {
   const [username, setUsername] = useState("");
