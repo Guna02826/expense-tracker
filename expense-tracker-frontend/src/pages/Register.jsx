@@ -7,11 +7,14 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setError(null);
+    setLoading(true);
     try {
       await axios.post("http://localhost:8080/api/auth/register", {
         username,
@@ -21,6 +24,8 @@ export default function Register() {
       navigate("/login");
     } catch (err) {
       setError("Registration failed. Try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -82,9 +87,14 @@ export default function Register() {
 
           <button
             type="submit"
-            className="w-full px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition"
+            className={`w-full px-4 py-2 text-white rounded-lg transition ${
+              loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
+            disabled={loading}
           >
-            Register
+            {loading ? "Registering..." : "Register"}
           </button>
         </form>
 
