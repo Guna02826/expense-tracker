@@ -23,6 +23,7 @@ export default function Register() {
       });
       navigate("/login");
     } catch (err) {
+      console.log(err);
       setError("Registration failed. Try again.");
     } finally {
       setLoading(false);
