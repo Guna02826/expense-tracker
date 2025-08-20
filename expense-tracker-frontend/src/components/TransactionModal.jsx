@@ -1,6 +1,11 @@
 import { useState, useEffect } from "react";
 
-export default function TransactionModal({ isOpen, onClose, onSave, transaction }) {
+export default function TransactionModal({
+  isOpen,
+  onClose,
+  onSave,
+  transaction,
+}) {
   const EXPENSE_CATEGORIES = [
     "Food",
     "Groceries",
@@ -50,13 +55,16 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction 
     date: "",
   });
 
+  const [saving, setSaving] = useState(false);
+
   // Initialize or reset form when modal opens or transaction changes
   useEffect(() => {
     if (isOpen) {
       if (transaction) {
         const displayCategory =
-          Object.entries(categoryMap).find(([display, key]) => key === transaction.category)?.[0] ||
-          transaction.category;
+          Object.entries(categoryMap).find(
+            ([display, key]) => key === transaction.category
+          )?.[0] || transaction.category;
 
         const formattedDate = transaction.date
           ? new Date(transaction.date).toISOString().split("T")[0]
@@ -107,29 +115,37 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction 
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setSaving(true);
 
-    if (!form.title.trim()) {
-      alert("Title is required");
-      return;
+    try {
+      if (!form.title.trim()) {
+        alert("Title is required");
+        return;
+      }
+
+      if (Number(form.amount) <= 0) {
+        alert("Amount must be greater than zero");
+        return;
+      }
+
+      const payload = {
+        ...form,
+        amount: Number(form.amount),
+        category: categoryMap[form.category],
+      };
+
+      onSave(payload);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setSaving(false);
     }
-
-    if (Number(form.amount) <= 0) {
-      alert("Amount must be greater than zero");
-      return;
-    }
-
-    const payload = {
-      ...form,
-      amount: Number(form.amount),
-      category: categoryMap[form.category],
-    };
-
-    onSave(payload);
   };
 
   if (!isOpen) return null;
 
-  const categories = form.type === "EXPENSE" ? EXPENSE_CATEGORIES : INCOME_CATEGORIES;
+  const categories =
+    form.type === "EXPENSE" ? EXPENSE_CATEGORIES : INCOME_CATEGORIES;
 
   return (
     <div className="fixed inset-0 bg-transparent backdrop-blur-sm backdrop-brightness-75 bg-opacity-40 flex justify-center items-center z-50 p-4 sm:p-6 overflow-auto">
