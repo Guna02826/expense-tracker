@@ -86,6 +86,35 @@ function Login() {
           >
             {loading ? "Logging in..." : "Login"}
           </button>
+
+          <button
+            type="button"
+            onClick={async () => {
+              setError(null);
+              setLoading(true);
+              try {
+                const response = await api.post("/auth/login", {
+                  email: "demo@trackeroo.com",
+                  password: "demo123",
+                });
+                localStorage.setItem("token", response.data.token);
+                navigate("/dashboard");
+              } catch (err) {
+                setError("Demo login failed. Please try again.");
+              } finally {
+                setLoading(false);
+              }
+            }}
+            disabled={loading}
+            className={`w-full mt-3 px-4 py-2 text-white rounded-lg transition font-medium ${
+              loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-emerald-600 hover:bg-emerald-700"
+            }`}
+            title="Try the full app experience instantly"
+          >
+            {loading ? "Loading..." : "Sign in as Demo User (No login)"}
+          </button>
         </form>
 
         <p className="text-sm text-center text-gray-600">

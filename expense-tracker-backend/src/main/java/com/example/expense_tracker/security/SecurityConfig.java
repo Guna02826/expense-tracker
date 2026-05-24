@@ -27,7 +27,7 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(request -> {
                     var config = new org.springframework.web.cors.CorsConfiguration();
-                    config.setAllowedOrigins(List.of("https://trackeroo.netlify.app"));
+                    config.setAllowedOrigins(List.of("https://trackeroo.netlify.app", "http://localhost:5173", "http://localhost:3000"));
                     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
                     config.setAllowedHeaders(List.of("*"));
                     config.setAllowCredentials(true);
@@ -44,8 +44,4 @@ public class SecurityConfig {
         return http.build();
     }
 
-
-
-
 }
-
