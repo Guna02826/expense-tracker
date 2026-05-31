@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 import TransactionModal from "../components/TransactionModal";
+import toast from "react-hot-toast";
 
 export default function TransactionsPage() {
   const [transactions, setTransactions] = useState([]);
@@ -31,7 +32,10 @@ export default function TransactionsPage() {
     api
       .get("/transactions")
       .then((res) => setTransactions(res.data))
-      .catch((err) => setError("Failed to load transactions"))
+      .catch((err) => {
+        setError("Failed to load transactions.");
+        toast.error("Failed to load transactions.");
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -121,10 +125,12 @@ export default function TransactionsPage() {
         const res = await api.post("/transactions", form);
         setTransactions((prev) => [res.data, ...prev]);
       }
+      toast.success(editingTransaction ? "Transaction updated!" : "Transaction added!");
       setModalOpen(false);
       setEditingTransaction(null);
     } catch (error) {
       console.error(error);
+      toast.error("Failed to save transaction.");
     }
   };
 
@@ -138,8 +144,10 @@ export default function TransactionsPage() {
       try {
         await api.delete(`/transactions/${id}`);
         setTransactions((prev) => prev.filter((t) => t.id !== id));
+        toast.success("Transaction deleted!");
       } catch (error) {
         setError("Error Deleting Transaction");
+        toast.error("Failed to delete transaction.");
         console.error(error);
       } finally {
         setLoading(false);

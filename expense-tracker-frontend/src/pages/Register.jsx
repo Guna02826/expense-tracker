@@ -1,19 +1,18 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router";
 import api from "../api/axios";
+import toast from "react-hot-toast";
 
 export default function Register() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    setError(null);
     setLoading(true);
     try {
       await api.post("/auth/register", {
@@ -21,10 +20,11 @@ export default function Register() {
         email,
         password,
       });
+      toast.success("Registration successful! Please login.");
       navigate("/login");
     } catch (err) {
       console.log(err);
-      setError("Registration failed. Try again.");
+      toast.error(err.response?.data?.message || "Registration failed. Try again.");
     } finally {
       setLoading(false);
     }
@@ -36,12 +36,6 @@ export default function Register() {
         <h2 className="text-2xl font-bold text-center text-gray-800">
           Create an Account
         </h2>
-
-        {error && (
-          <div className="p-2 text-sm text-red-700 bg-red-100 rounded-md">
-            {error}
-          </div>
-        )}
 
         <form className="space-y-4" onSubmit={handleRegister}>
           <div>

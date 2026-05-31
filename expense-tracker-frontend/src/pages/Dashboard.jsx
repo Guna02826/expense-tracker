@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
+import toast from "react-hot-toast";
 import TransactionModal from "../components/TransactionModal";
 import {
   PieChart,
@@ -36,7 +37,8 @@ export default function Dashboard() {
       setCategoryTotals(categoryRes.data);
       setTransactions(transactionsRes.data);
     } catch (err) {
-      setError("Registration failed. Try again.");
+      setError("Failed to load dashboard data. Please try again.");
+      toast.error("Failed to load dashboard data.");
       console.error("Failed to fetch dashboard data:", err);
     } finally {
       setLoading(false);
@@ -61,9 +63,11 @@ export default function Dashboard() {
       await api.post("/transactions", form);
       setShowModal(false);
       setAddingTransaction(null);
+      toast.success("Transaction saved!");
       fetchData();
     } catch (error) {
       console.error(error);
+      toast.error("Failed to save transaction.");
     }
   };
 

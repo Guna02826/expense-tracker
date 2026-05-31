@@ -11,6 +11,7 @@ import Register from "../src/pages/Register";
 import Dashboard from "../src/pages/Dashboard";
 import TransactionsPage from "../src/pages/TransactionsPage";
 import PrivateRoute from "../src/components/PrivateRoute";
+import { Toaster } from "react-hot-toast";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -77,6 +78,7 @@ function NotFound() {
 function App() {
   return (
     <Router>
+      <Toaster position="bottom-right" />
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
