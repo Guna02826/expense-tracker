@@ -1,9 +1,12 @@
 package com.example.expense_tracker.controller;
 
+import com.example.expense_tracker.dto.TransactionRequestDTO;
+import com.example.expense_tracker.dto.TransactionResponseDTO;
 import com.example.expense_tracker.entity.Transaction;
 import com.example.expense_tracker.entity.User;
 import com.example.expense_tracker.service.TransactionService;
 import com.example.expense_tracker.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,24 +27,24 @@ public class TransactionController {
     private UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<Transaction>> getAllTransactionsForUser() {
+    public ResponseEntity<List<TransactionResponseDTO>> getAllTransactionsForUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-
         Optional<User> userOptional = userService.getUserByEmail(email);
 
         if (userOptional.isPresent()) {
             Long userId = userOptional.get().getId();
             List<Transaction> transactions = transactionService.getAllTransaction(userId);
-
-            return ResponseEntity.ok(transactions);
+            List<TransactionResponseDTO> response = transactions.stream()
+                    .map(this::toResponseDTO)
+                    .toList();
+            return ResponseEntity.ok(response);
         }
-
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(List.of());
     }
 
     @GetMapping("/{transactionId}")
-    public ResponseEntity<Transaction> getTransactionById(@PathVariable Long transactionId) {
+    public ResponseEntity<TransactionResponseDTO> getTransactionById(@PathVariable Long transactionId) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<User> userOptional = userService.getUserByEmail(email);
 
@@ -50,38 +53,34 @@ public class TransactionController {
         }
 
         Long userId = userOptional.get().getId();
-
         Optional<Transaction> transaction = transactionService.getTransactionByIdAndUserId(transactionId, userId);
 
-        if (transaction.isPresent()) {
-            return new ResponseEntity<>(transaction.get(), HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return transaction
+                .map(t -> new ResponseEntity<>(toResponseDTO(t), HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PostMapping
-    public ResponseEntity<Transaction> createTransaction(@RequestBody Transaction transactionReq) {
+    public ResponseEntity<TransactionResponseDTO> createTransaction(@Valid @RequestBody TransactionRequestDTO dto) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<User> userOptional = userService.getUserByEmail(email);
 
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            transactionReq.setUser(user);
+            Transaction transaction = toEntity(dto);
+            transaction.setUser(user);
 
-            Transaction savedTransaction = transactionService.saveTransaction(transactionReq);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedTransaction); // ✅ Return actual object
+            Transaction saved = transactionService.saveTransaction(transaction);
+            return ResponseEntity.status(HttpStatus.CREATED).body(toResponseDTO(saved));
         }
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
-
     @PutMapping("/{transactionId}")
-    public ResponseEntity<Transaction> updateTransaction(
+    public ResponseEntity<TransactionResponseDTO> updateTransaction(
             @PathVariable Long transactionId,
-            @RequestBody Transaction transactionReq) {
+            @Valid @RequestBody TransactionRequestDTO dto) {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<User> userOptional = userService.getUserByEmail(email);
@@ -91,13 +90,13 @@ public class TransactionController {
         }
 
         User user = userOptional.get();
-
-        transactionReq.setId(transactionId);
-        transactionReq.setUser(user);
+        Transaction transaction = toEntity(dto);
+        transaction.setId(transactionId);
+        transaction.setUser(user);
 
         try {
-            Transaction updated = transactionService.editTransaction(transactionReq);
-            return new ResponseEntity<>(updated, HttpStatus.OK);
+            Transaction updated = transactionService.editTransaction(transaction);
+            return new ResponseEntity<>(toResponseDTO(updated), HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -113,9 +112,33 @@ public class TransactionController {
         }
 
         Long userId = userOptional.get().getId();
-
         transactionService.deleteTransactionByIdAndUserId(transactionId, userId);
 
         return new ResponseEntity<>("Transaction deleted successfully (if existed)", HttpStatus.OK);
+    }
+
+    // ── Mapper Methods ──
+
+    private TransactionResponseDTO toResponseDTO(Transaction t) {
+        return TransactionResponseDTO.builder()
+                .id(t.getId())
+                .title(t.getTitle())
+                .amount(t.getAmount())
+                .type(t.getType())
+                .category(t.getCategory())
+                .date(t.getDate())
+                .note(t.getNote())
+                .build();
+    }
+
+    private Transaction toEntity(TransactionRequestDTO dto) {
+        return Transaction.builder()
+                .title(dto.getTitle())
+                .amount(dto.getAmount())
+                .type(dto.getType())
+                .category(dto.getCategory())
+                .date(dto.getDate())
+                .note(dto.getNote())
+                .build();
     }
 }

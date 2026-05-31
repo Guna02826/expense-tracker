@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
 
@@ -25,22 +26,7 @@ public class ReportController {
     private UserService userService;
 
     @GetMapping("/summary")
-    public ResponseEntity<Map<String, Double>> getSummary(){
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Optional<User> userOptional = userService.getUserByEmail(email);
-
-        if(userOptional.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        Long userId = userOptional.get().getId();
-        Map<String, Double> summary = reportService.getSummary(userId);
-
-        return ResponseEntity.ok(summary);
-    }
-
-    @GetMapping("/by-category")
-    public ResponseEntity<Map<String, Double>> getByCategory() {
+    public ResponseEntity<Map<String, BigDecimal>> getSummary() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<User> userOptional = userService.getUserByEmail(email);
 
@@ -49,7 +35,22 @@ public class ReportController {
         }
 
         Long userId = userOptional.get().getId();
-        Map<String, Double> categoryTotals = reportService.getTotalByCategory(userId);
+        Map<String, BigDecimal> summary = reportService.getSummary(userId);
+
+        return ResponseEntity.ok(summary);
+    }
+
+    @GetMapping("/by-category")
+    public ResponseEntity<Map<String, BigDecimal>> getByCategory() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<User> userOptional = userService.getUserByEmail(email);
+
+        if (userOptional.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        Long userId = userOptional.get().getId();
+        Map<String, BigDecimal> categoryTotals = reportService.getTotalByCategory(userId);
 
         return ResponseEntity.ok(categoryTotals);
     }

@@ -11,6 +11,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -35,7 +36,6 @@ public class DataSeeder implements CommandLineRunner {
 
         System.out.println("🌱 Seeding demo user and transactions...");
 
-        // 1. Create demo user
         User demoUser = User.builder()
                 .username("Demo User")
                 .email("demo@trackeroo.com")
@@ -43,7 +43,6 @@ public class DataSeeder implements CommandLineRunner {
                 .build();
         demoUser = userRepository.save(demoUser);
 
-        // 2. Create all transactions
         List<Transaction> transactions = List.of(
             // ===== INCOME (12 entries) =====
             tx(demoUser, "March Salary", 65000, TransactionType.INCOME, TransactionCategory.SALARY, LocalDate.of(2025, 3, 1)),
@@ -99,14 +98,11 @@ public class DataSeeder implements CommandLineRunner {
         System.out.println("✅ Demo user seeded with " + transactions.size() + " transactions.");
     }
 
-    /**
-     * Helper method to build a Transaction object.
-     */
-    private Transaction tx(User user, String title, double amount, TransactionType type, TransactionCategory category, LocalDate date) {
+    private Transaction tx(User user, String title, long amount, TransactionType type, TransactionCategory category, LocalDate date) {
         return Transaction.builder()
                 .user(user)
                 .title(title)
-                .amount(amount)
+                .amount(BigDecimal.valueOf(amount))
                 .type(type)
                 .category(category)
                 .date(date)

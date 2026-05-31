@@ -6,13 +6,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigInteger;
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Date;
 
 @Entity
 @Data
-@Table(name = "transactions" )
+@Table(name = "transactions")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,14 +21,14 @@ public class Transaction {
     private Long id;
     private String title;
 
-    private double amount;
+    @Column(precision = 12, scale = 2)
+    private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
     private TransactionType type;
 
     @Enumerated(EnumType.STRING)
     private TransactionCategory category;
-
 
     private LocalDate date;
 
