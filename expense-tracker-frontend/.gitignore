@@ -27,3 +27,9 @@ dist-ssr
 .env
 .env.*
 
+# Ignore Frontend Tests
+src/__tests__/
+**/*.test.js
+**/*.test.jsx
+vitest.config.js
+setupTests.js

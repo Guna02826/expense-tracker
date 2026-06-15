@@ -23,3 +23,13 @@ target/
 .vscode/
 .idea/
 .DS_Store
+
+# Ignore Backend Tests
+expense-tracker-backend/src/test/
+
+# Ignore Frontend Tests
+expense-tracker-frontend/src/__tests__/
+expense-tracker-frontend/**/*.test.js
+expense-tracker-frontend/**/*.test.jsx
+expense-tracker-frontend/vitest.config.js
+expense-tracker-frontend/setupTests.js

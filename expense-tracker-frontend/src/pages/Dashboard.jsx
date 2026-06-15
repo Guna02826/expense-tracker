@@ -168,38 +168,51 @@ export default function Dashboard() {
           </div>
 
           {/* Spending by Category Pie Chart */}
-          <div className="bg-white pb-15 rounded-xl shadow w-full max-w-full">
+          <div className="bg-white p-4 sm:p-6 rounded-xl shadow w-full max-w-full">
             <h2 className="text-lg sm:text-xl font-semibold mb-4 text-center sm:text-left">
               Spending by Category
             </h2>
 
             {pieData.length > 0 ? (
-              <div
-                className="w-full max-w-4xl mx-auto"
-                style={{ height: "300px", maxWidth: "100%" }}
-              >
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={pieData}
-                      dataKey="value"
-                      nameKey="name"
-                      outerRadius={80}
-                      fill="#8884d8"
-                      label
-                    >
-                      {pieData.map(({ name }, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={CATEGORY_COLORS[name] || "#CCCCCC"}
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                    <Legend verticalAlign="bottom" height={36} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
+              <>
+                <div
+                  className="w-full max-w-4xl mx-auto"
+                  style={{ height: "300px", maxWidth: "100%" }}
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={pieData}
+                        dataKey="value"
+                        nameKey="name"
+                        outerRadius={80}
+                        fill="#8884d8"
+                        label
+                      >
+                        {pieData.map(({ name }, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={CATEGORY_COLORS[name] || "#CCCCCC"}
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                {/* Custom Responsive Legend */}
+                <ul className="mt-8 flex flex-wrap justify-center gap-x-4 gap-y-3 text-xs sm:text-sm">
+                  {pieData.map(({ name }) => (
+                    <li key={`legend-${name}`} className="flex items-center gap-1.5">
+                      <span
+                        className="block w-3 h-3 rounded-sm"
+                        style={{ backgroundColor: CATEGORY_COLORS[name] || "#CCC" }}
+                      />
+                      <span className="text-gray-700 font-medium">{name}</span>
+                    </li>
+                  ))}
+                </ul>
+              </>
             ) : (
               <div className="flex items-center justify-center h-48 text-gray-500">
                 <ResponsiveContainer width="100%" height="100%">
@@ -215,7 +228,6 @@ export default function Dashboard() {
                       <Cell fill="#CCCCCC" />
                     </Pie>
                     <Tooltip />
-                    <Legend verticalAlign="bottom" height={36} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
